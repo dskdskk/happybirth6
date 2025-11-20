@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>专属生日惊喜</title>
+    <!-- 引入字体和图标库 -->
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Pacifico&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- 引入动画库 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        /* --- 全局变量与重置 --- */
+        :root {
+            --primary: #ff6b6b;
+            --accent: #feca57;
+            --text-light: #fff;
+            --bg-gradient: radial-gradient(circle at center, #2c3e50 0%, #000000 100%);
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Ma Shan Zheng', cursive, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-light);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        /* --- 通用组件 --- */
+        .hidden { display: none !important; }
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        .btn-primary { background: var(--primary); color: white; }
+        .btn-primary:hover { transform: scale(1.1); background: #ff4757; }
+
+        /* --- 第一关：密码解锁 --- */
+        #stage-login {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: url('https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=1920&auto=format&fit=crop') no-repeat center/cover;
+        }
+        .login-box {
+            background: rgba(255,255,255,0.15);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            animation: fadeInDown 1s;
+        }
+        .login-input {
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin: 20px 0;
+            width: 80%;
+            font-size: 1rem;
+            text-align: center;
+        }
+
+        /* --- 第二关：礼物盒与计时 --- */
+        #stage-gift {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .timer-display {
+            font-size: 1.5rem;
+            margin-bottom: 50px;
+            text-align: center;
+            line-height: 1.5;
+            text-shadow: 0 0 10px var(--primary);
+        }
+        
+        /* 3D 礼物盒 CSS */
+        .gift-container {
+            perspective: 1000px;
+            cursor: pointer;
+        }
+        .gift-box {
+            width: 150px; height: 150px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+            animation: floatBox 3s infinite ease-in-out;
+        }
+        .gift-box:hover { transform: rotateY(180deg); }
+        .face {
+            position: absolute; width: 150px; height: 150px;
+            background: var(--primary);
+            border: 2px solid #d63031;
+        }
+        .face.front { transform: translateZ(75px); }
+        .face.back { transform: rotateY(180deg) translateZ(75px); }
+        .face.right { transform: rotateY(90deg) translateZ(75px); }
+        .face.left { transform: rotateY(-90deg) translateZ(75px); }
+        .face.top { transform: rotateX(90deg) translateZ(75px); background: #ff7675; }
+        .face.bottom { transform: rotateX(-90deg) translateZ(75px); }
+        
+        .ribbon {
+            position: absolute; width: 30px; height: 150px;
+            background: var(--accent);
+            left: 60px;
+        }
+        .ribbon-h {
+            position: absolute; width: 150px; height: 30px;
+            background: var(--accent);
+            top: 60px;
+        }
+
+        /* --- 第三关：主派对 --- */
+        #stage-party {
+            padding-bottom: 100px;
+        }
+        
+        /* 弹幕层 */
+        #danmaku-container {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 1; overflow: hidden;
+        }
+        .danmaku-item {
+            position: absolute; white-space: nowrap;
+            font-size: 1.2rem; color: rgba(255,255,255,0.8);
+            animation: moveLeft linear;
+        }
+
+        /* 内容区 */
+        .content-wrapper {
+            position: relative; z-index: 10;
+            max-width: 800px; margin: 0 auto;
+            text-align: center;
+        }
+
+        /* 蛋糕 */
+        .cake-section { margin: 50px 0; transform: scale(0.8); }
+        /* 复用之前的蛋糕CSS，微调 */
+        .cake { width: 250px; height: 200px; margin: 0 auto; position: relative;}
+        .plate { width: 270px; height: 10px; background: #eee; position: absolute; bottom: -10px; left: -10px; border-radius: 10px; }
+        .layer { position: absolute; width: 250px; height: 100px; border-radius: 10px 10px 0 0; }
+        .layer-bottom { bottom: 0; background: #a37551; }
+        .layer-middle { bottom: 50px; background: #f4c29f; height: 90px; width: 230px; left: 10px; }
+        .layer-top { bottom: 100px; background: #ffccd5; height: 80px; width: 210px; left: 20px; border-radius: 50%; }
+        .candle { width: 10px; height: 40px; background: #fff; position: absolute; top: -40px; left: 100px; }
+        .flame { width: 15px; height: 20px; background: orange; border-radius: 50% 50% 20% 20%; position: absolute; top: -15px; left: -2.5px; animation: flicker 0.5s infinite; cursor: pointer; box-shadow: 0 0 10px orange; }
+
+        /* 信纸 */
+        .letter-box {
+            background: url('https://www.transparenttextures.com/patterns/cream-paper.png'), #fff;
+            color: #333;
+            padding: 40px;
+            margin: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            font-size: 1.2rem;
+            line-height: 1.8;
+            text-align: left;
+            position: relative;
+        }
+        .letter-box::before {
+            content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+            width: 100px; height: 20px; background: rgba(255,255,255,0.3); transform: rotate(-2deg);
+        }
+
+        /* 时间轴 */
+        .timeline {
+            position: relative; margin: 50px 20px;
+            border-left: 4px solid var(--primary);
+            padding-left: 20px; text-align: left;
+        }
+        .timeline-item {
+            margin-bottom: 40px; position: relative;
+            background: rgba(255,255,255,0.1); padding: 20px;
+            border-radius: 10px; border: 1px solid rgba(255,255,255,0.2);
+        }
+        .timeline-item::before {
+            content: '❤'; position: absolute; left: -31px; top: 10px;
+            background: var(--primary); width: 24px; height: 24px;
+            border-radius: 50%; text-align: center; line-height: 24px;
+        }
+        .timeline-date { font-size: 0.9rem; color: var(--accent); margin-bottom: 5px; }
+        .timeline-img { width: 100%; border-radius: 5px; margin-top: 10px; transition: transform 0.3s; }
+        .timeline-img:hover { transform: scale(1.05); }
+
+        /* 许愿灯 */
+        #wish-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); z-index: 200;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .wish-card {
+            background: #fff; color: #333; padding: 30px;
+            border-radius: 15px; width: 90%; max-width: 400px;
+            text-align: center;
+        }
+        .wish-input {
+            width: 100%; height: 100px; padding: 10px;
+            margin: 20px 0; border: 1px solid #ccc;
+        }
+
+        /* 音乐控制 */
+        .music-btn {
+            position: fixed; top: 20px; right: 20px; z-index: 100;
+            background: rgba(0,0,0,0.5); color: #fff;
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: 1px solid #fff;
+        }
+        .spin { animation: rotate 4s linear infinite; }
+
+        /* 动画 Keyframes */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes floatBox { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        @keyframes rotate { to { transform: rotate(360deg); } }
+        @keyframes flicker { 0%, 100% { opacity: 1; } 50% { opacity: 0.8; transform: scale(1.1); } }
+        @keyframes moveLeft { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
+        @keyframes flyUp { 0% { bottom: 0; opacity: 1; } 100% { bottom: 100vh; opacity: 0; } }
+
+        .lantern {
+            position: absolute; width: 30px; height: 40px; background: red;
+            border-radius: 5px; animation: flyUp 10s linear forwards;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 背景音乐 -->
+    <audio id="bgm" loop>
+        <source src="https://dl.dropboxusercontent.com/s/h8oc07r7680e30m/Happy%20Birthday.mp3" type="audio/mpeg">
+    </audio>
+    <div class="music-btn" onclick="toggleMusic()"><i class="fas fa-music"></i></div>
+
+    <!-- 弹幕容器 -->
+    <div id="danmaku-container"></div>
+
+    <!-- === 第一关：密码 === -->
+    <div id="stage-login">
+        <div class="login-box">
+            <h2>✨ 寿星验证 ✨</h2>
+            <p>请输入你的名字（或昵称）开启</p>
+            <!-- 这里设置密码逻辑，默认为 '小可爱' -->
+            <input type="text" id="password-input" class="login-input" placeholder="我是谁？">
+            <button class="btn btn-primary" onclick="checkPasscode()">确认</button>
+            <p id="error-msg" style="color: #ff6b6b; margin-top: 10px; display: none;">不对哦，再试试~</p>
+        </div>
+    </div>
+
+    <!-- === 第二关：礼物与时间 === -->
+    <div id="stage-gift" class="hidden">
+        <div class="timer-display" id="timer"></div>
+        <div class="gift-container" onclick="openGift()">
+            <div class="gift-box">
+                <div class="face front"></div>
+                <div class="face back"></div>
+                <div class="face right"></div>
+                <div class="face left"></div>
+                <div class="face top"></div>
+                <div class="face bottom"></div>
+                <div class="ribbon"></div>
+                <div class="ribbon-h"></div>
+            </div>
+        </div>
+        <p style="margin-top: 30px; animation: pulse 1s infinite;">👆 点击拆开礼物 👆</p>
+    </div>
+
+    <!-- === 第三关：派对主场 === -->
+    <div id="stage-party" class="hidden animate__animated animate__fadeIn">
+        <div class="content-wrapper">
+            <h1 class="animate__animated animate__bounceInDown" style="font-family: 'Pacifico'; font-size: 3.5rem; margin-top: 30px;">Happy Birthday!</h1>
+            
+            <!-- 蛋糕 -->
+            <div class="cake-section">
+                <div class="cake">
+                    <div class="plate"></div>
+                    <div class="layer layer-bottom"></div>
+                    <div class="layer layer-middle"></div>
+                    <div class="layer layer-top"></div>
+                    <div class="candle">
+                        <div class="flame" id="flame" onclick="blowCandle()"></div>
+                    </div>
+                </div>
+                <p style="margin-top: 10px; color: #ddd;">( 点击火焰吹灭蜡烛 )</p>
+            </div>
+
+            <!-- 信件 -->
+            <div class="letter-box">
+                <span id="typewriter-text"></span>
+            </div>
+
+            <!-- 时间轴 (照片墙升级版) -->
+            <div class="timeline">
+                <h2 style="text-align: center; margin-bottom: 30px;">🕰️ 我们的时光印记</h2>
+                
+                <!-- 时间节点 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-date">2020年5月20日</div>
+                    <h3>初次相遇</h3>
+                    <p>那是一个阳光明媚的下午，我们在图书馆门口...</p>
+                    <img src="https://via.placeholder.com/400x200/ff6b6b/fff?text=Meeting" class="timeline-img" alt="相遇">
+                </div>
+                
+                <!-- 时间节点 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-date">2021年1月1日</div>
+                    <h3>一起跨年</h3>
+                    <p>烟花下的你笑得比烟花还好看。</p>
+                    <img src="https://via.placeholder.com/400x200/feca57/fff?text=New+Year" class="timeline-img" alt="跨年">
+                </div>
+                 <!-- 时间节点 3 -->
+                 <div class="timeline-item">
+                    <div class="timeline-date">2023年 生日</div>
+                    <h3>去年的生日</h3>
+                    <p>还是那个蛋糕，还是那个愿望。</p>
+                    <img src="https://via.placeholder.com/400x200/54a0ff/fff?text=Last+Birthday" class="timeline-img" alt="生日">
+                </div>
+            </div>
+
+            <!-- 底部按钮 -->
+            <button class="btn btn-primary" onclick="showWishModal()">✨ 我要许愿 ✨</button>
+        </div>
+    </div>
+
+    <!-- 许愿弹窗 -->
+    <div id="wish-modal" class="hidden">
+        <div class="wish-card animate__animated animate__zoomIn">
+            <h3>许下今年的愿望</h3>
+            <textarea class="wish-input" id="wish-text" placeholder="在这里写下愿望..."></textarea>
+            <button class="btn btn-primary" onclick="submitWish()">发送愿望 🎈</button>
+            <button class="btn" style="background: #ccc; margin-left: 10px;" onclick="closeWishModal()">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        /* === 配置区域 (请在这里修改) === */
+        const config = {
+            // 1. 登录密码 (填这里)
+            correctPassword: "小可爱",
+            
+            // 2. 你们的开始时间 (格式：YYYY-MM-DD)
+            startDate: "2000-01-01", 
+            
+            // 3. 信件内容 (支持HTML)
+            letter: `亲爱的 [名字]：<br><br>
+            这是我们认识的第 N 个年头了。<br>
+            看着这些照片，仿佛昨天才刚刚发生。<br>
+            <br>
+            愿你的生活每天都像今天的蛋糕一样甜。<br>
+            愿你在未来的日子里，<br>
+            眼里有光，心中有爱。<br>
+            <br>
+            生日快乐！🎂<br>
+            -- 爱你的 [你的名字]`,
+
+            // 4. 弹幕内容库
+            danmakuText: [
+                "生日快乐！🎂", "永远18岁！✨", "天天开心！😄", 
+                "暴富暴瘦！💰", "心想事成！🌟", "颜值爆表！😍", 
+                "万事如意！🎉", "前程似锦！🚀"
+            ]
+        };
+
+        /* === 逻辑区域 === */
+        const bgm = document.getElementById('bgm');
+        let musicPlaying = false;
+
+        // 1. 密码检查
+        function checkPasscode() {
+            const input = document.getElementById('password-input').value;
+            if (input === config.correctPassword) {
+                document.getElementById('stage-login').classList.add('hidden');
+                document.getElementById('stage-gift').classList.remove('hidden');
+                initTimer();
+            } else {
+                document.getElementById('error-msg').style.display = 'block';
+                // 震动效果
+                document.querySelector('.login-box').classList.add('animate__shakeX');
+                setTimeout(() => document.querySelector('.login-box').classList.remove('animate__shakeX'), 1000);
+            }
+        }
+
+        // 2. 计时器
+        function initTimer() {
+            const start = new Date(config.startDate);
+            setInterval(() => {
+                const now = new Date();
+                const diff = now - start;
+                
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                document.getElementById('timer').innerHTML = 
+                    `我们已经相识了：<br>
+                    <span style="font-size: 3rem; color: var(--primary)">${days}</span> 天 
+                    <span style="font-size: 2rem">${hours}</span> 小时 
+                    <span style="font-size: 2rem">${seconds}</span> 秒`;
+            }, 1000);
+        }
+
+        // 3. 开礼物
+        function openGift() {
+            toggleMusic(); // 尝试播放音乐
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+            
+            document.querySelector('.gift-box').style.transform = "scale(5) rotateY(180deg)";
+            document.querySelector('.gift-box').style.opacity = "0";
+            
+            setTimeout(() => {
+                document.getElementById('stage-gift').classList.add('hidden');
+                document.getElementById('stage-party').classList.remove('hidden');
+                initDanmaku();
+                typeWriter(config.letter, 0);
+            }, 800);
+        }
+
+        // 4. 吹蜡烛
+        function blowCandle() {
+            document.getElementById('flame').style.opacity = 0;
+            confetti({ particleCount: 300, spread: 100, origin: { y: 0.6 } });
+            alert("🎉 愿望已许下，生日快乐！");
+        }
+
+        // 5. 许愿逻辑
+        function showWishModal() { document.getElementById('wish-modal').classList.remove('hidden'); }
+        function closeWishModal() { document.getElementById('wish-modal').classList.add('hidden'); }
+        
+        function submitWish() {
+            const text = document.getElementById('wish-text').value;
+            if(text) {
+                closeWishModal();
+                // 创建放飞的气球/灯笼效果
+                const lantern = document.createElement('div');
+                lantern.className = 'lantern';
+                lantern.style.left = Math.random() * 80 + 10 + '%';
+                lantern.innerText = '🏮'; // 可以换成图片
+                lantern.style.fontSize = '30px';
+                lantern.style.background = 'transparent';
+                document.body.appendChild(lantern);
+                
+                setTimeout(() => lantern.remove(), 10000);
+                alert("愿望已飞向云端！☁️");
+            }
+        }
+
+        // 6. 打字机
+        function typeWriter(text, i) {
+            const el = document.getElementById('typewriter-text');
+            if (i < text.length) {
+                el.innerHTML = text.substring(0, i+1);
+                setTimeout(() => typeWriter(text, i + 1), 50);
+            }
+        }
+
+        // 7. 弹幕系统
+        function initDanmaku() {
+            const container = document.getElementById('danmaku-container');
+            setInterval(() => {
+                const item = document.createElement('div');
+                item.className = 'danmaku-item';
+                item.innerText = config.danmakuText[Math.floor(Math.random() * config.danmakuText.length)];
+                item.style.top = Math.random() * 80 + '%';
+                item.style.animationDuration = (Math.random() * 5 + 5) + 's';
+                container.appendChild(item);
+                
+                // 动画结束后移除
+                item.addEventListener('animationend', () => item.remove());
+            }, 1500);
+        }
+
+        // 音乐控制
+        function toggleMusic() {
+            if (bgm.paused) {
+                bgm.play();
+                document.querySelector('.music-btn').classList.add('spin');
+            } else {
+                bgm.pause();
+                document.querySelector('.music-btn').classList.remove('spin');
+            }
+        }
+    </script>
+</body>
+</html>
