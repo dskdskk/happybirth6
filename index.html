@@ -232,7 +232,7 @@
 
     <!-- BGM: 请替换为你的mp3链接 -->
     <audio id="bgm" loop>
-        <source src="music\bgMusic.mp3" type="audio/mpeg">
+        <source src="bgMusic.mp3" type="audio/mpeg">
     </audio>
     <div class="music-orb" onclick="toggleMusic()">
         <i class="fas fa-music"></i>
@@ -243,7 +243,7 @@
         <div class="glass-panel login-card">
             <div class="login-title">Happy Birthday</div>
             <p style="color:#fff; opacity:0.9;">专属你的梦幻空间</p>
-            <input type="text" id="name-input" class="login-input" placeholder="请输入寿星名字 (王延芳)">
+            <input type="text" id="name-input" class="login-input" placeholder="请输入寿星名字">
             <button class="btn btn-primary" style="width:100%" onclick="checkName()">开启惊喜 ✨</button>
         </div>
     </div>
@@ -308,13 +308,13 @@
     <script>
         // === 配置中心 ===
         const CONFIG = {
-            correctNames: ["王延芳", "延芳", "芳芳", "小芳"], // 允许的名字
-            birthDate: "2000-01-01", // 这里的日期用于计算
+            correctNames: ["王延芳", "延芳", "芳芳", "小芳"，"大芳"], // 允许的名字
+            birthDate: "2004-11-30", // 这里的日期用于计算
             letterText: `
                 亲爱的王延芳：<br><br>
                 见信如晤。✨<br>
                 在这个温柔的日子里，<br>
-                我想把所有的美好都打包送给你。<br>
+                我想把所有的快乐都打包送给你。<br>
                 <br>
                 愿你的生活：<br>
                 有清风拂面，有阳光暖肩。<br>
@@ -370,7 +370,7 @@
                 const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
                 
                 document.getElementById('timer-display').innerHTML = 
-                    `地球上有了可爱的你：<br>
+                    `地球上有了独一无二的你：<br>
                     <b style="font-size:1.8rem; color:#ffeb3b">${d}</b> 天 
                     <b>${h}</b> 小时 <b>${m}</b> 分`;
             }, 1000);
@@ -474,7 +474,7 @@
             const lucks = [
                 "上上签：所念皆如愿", 
                 "大吉：财运滚滚来", 
-                "中吉：转角遇到爱", 
+                "中吉：生活没烦恼", 
                 "小吉：今日宜喝奶茶"
             ];
             Swal.fire({
@@ -514,3 +514,4 @@
     </script>
 </body>
 </html>
+
