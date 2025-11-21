@@ -5,20 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>王延芳的专属梦幻空间</title>
     
-    <!-- 1. 字体库：已替换为国内 loli.net 镜像 (速度极快) -->
+    <!-- 1. 字体库：国内 loli.net 镜像 -->
     <link href="https://fonts.loli.net/css2?family=Zcool+XiaoWei&family=Noto+Sans+SC:wght@300;500&family=Pacifico&display=swap" rel="stylesheet">
     
-    <!-- 2. 图标库：已替换为 Staticfile 源 -->
-    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    <!-- 2. 图标库：BootCDN 源 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
-    <!-- 3. 动画库：已替换为 Staticfile 源 -->
-    <link rel="stylesheet" href="https://cdn.staticfile.org/animate.css/4.1.1/animate.min.css"/>
+    <!-- 3. 动画库：BootCDN 源 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     
-    <!-- 4. 撒花特效库：已替换为 Staticfile 源 -->
-    <script src="https://cdn.staticfile.org/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
+    <!-- 4. 撒花特效库 (关键修改)：换成了更稳定的 BootCDN 源，修复烟花不显示问题 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/canvas-confetti/1.9.2/confetti.browser.min.js"></script>
     
-    <!-- 5. SweetAlert2 弹窗库：已替换为 Staticfile 源 -->
-    <script src="https://cdn.staticfile.org/sweetalert2/11.10.1/sweetalert2.all.min.js"></script>
+    <!-- 5. SweetAlert2 弹窗库：BootCDN 源 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/sweetalert2/11.10.1/sweetalert2.all.min.js"></script>
     
     <style>
         /* --- 0. 全局变量与重置 --- */
@@ -29,7 +29,7 @@
             --glass-bg: rgba(255, 255, 255, 0.25);
             --glass-border: rgba(255, 255, 255, 0.5);
             --text-main: #5d4e6d;
-            --font-heading: 'Zcool XiaoWei', serif; /* 优雅的衬线字体 */
+            --font-heading: 'Zcool XiaoWei', serif;
             --font-body: 'Noto Sans SC', sans-serif;
         }
 
@@ -37,14 +37,13 @@
 
         body {
             font-family: var(--font-body);
-            /* 极光流动背景 */
             background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fad0c4, #a18cd1);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
             color: var(--text-main);
             min-height: 100vh;
             overflow-x: hidden;
-            /* 自定义鼠标 */
+            /* 自定义鼠标为爱心 */
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="fill:white;stroke:%23ff9a9e;stroke-width:2px"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>') 12 12, auto;
         }
 
@@ -54,7 +53,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* --- 1. 通用 UI 组件 (毛玻璃风格) --- */
+        /* --- UI 组件 --- */
         .hidden { display: none !important; }
 
         .glass-panel {
@@ -66,7 +65,6 @@
             box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
         }
 
-        /* 按钮优化：果冻质感 */
         .btn {
             padding: 12px 35px;
             border: none;
@@ -74,7 +72,7 @@
             font-size: 1.1rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* 弹性贝塞尔 */
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             background: linear-gradient(135deg, #fff 0%, #f3f3f3 100%);
             color: var(--text-main);
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
@@ -90,7 +88,6 @@
         .btn:active { transform: scale(0.95); }
         .btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 25px rgba(161, 140, 209, 0.4); }
 
-        /* 音乐悬浮球 */
         .music-orb {
             position: fixed; top: 20px; right: 20px; z-index: 1000;
             width: 48px; height: 48px;
@@ -108,14 +105,9 @@
         .music-orb.playing i { color: #a18cd1; }
         @keyframes rotateOrb { 100% { transform: rotate(360deg); } }
 
-        /* --- 2. 场景一：登录 (极简优雅) --- */
-        #stage-login {
-            height: 100vh; display: flex; align-items: center; justify-content: center;
-        }
-        .login-card {
-            padding: 40px; width: 85%; max-width: 380px; text-align: center;
-            animation: floatCard 6s ease-in-out infinite;
-        }
+        /* --- 场景样式 --- */
+        #stage-login { height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { padding: 40px; width: 85%; max-width: 380px; text-align: center; animation: floatCard 6s ease-in-out infinite; }
         @keyframes floatCard { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 
         .login-title { font-family: var(--font-heading); font-size: 2rem; color: #fff; margin-bottom: 10px; text-shadow: 0 2px 4px rgba(0,0,0,0.1); }
@@ -128,15 +120,9 @@
         }
         .login-input:focus { background: #fff; border-color: #a18cd1; box-shadow: 0 0 15px rgba(161, 140, 209, 0.3); }
 
-        /* --- 3. 场景二：礼物 (呼吸感) --- */
-        #stage-gift {
-            height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
-        }
-        .timer-wrapper {
-            text-align: center; margin-bottom: 60px;
-            color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        /* 纯CSS 3D 礼物盒 (优化版) */
+        #stage-gift { height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .timer-wrapper { text-align: center; margin-bottom: 60px; color: #fff; text-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        
         .gift-container { perspective: 1000px; cursor: pointer; margin-bottom: 20px; }
         .gift-box {
             width: 160px; height: 160px; position: relative;
@@ -152,21 +138,15 @@
         .face.left { transform: rotateY(-90deg) translateZ(80px); background: #ff858a; }
         .face.top { transform: rotateX(90deg) translateZ(80px); background: #fff0f0; }
         .face.bottom { transform: rotateX(-90deg) translateZ(80px); background: #d67c80; }
-        
         .ribbon-v { position: absolute; width: 30px; height: 160px; background: #fff; left: 65px; transform: translateZ(81px); box-shadow: 0 0 5px rgba(0,0,0,0.1); }
         .ribbon-h { position: absolute; width: 160px; height: 30px; background: #fff; top: 65px; transform: translateZ(81px); }
         .bow { position: absolute; top: -20px; left: 50px; width: 60px; height: 20px; background: #fff; transform: rotateX(90deg) translateZ(80px); border-radius: 10px; }
 
-        /* --- 4. 场景三：派对 (内容聚合) --- */
-        #stage-party {
-            padding: 20px; min-height: 100vh; max-width: 700px; margin: 0 auto; padding-bottom: 100px;
-        }
-        
+        #stage-party { padding: 20px; min-height: 100vh; max-width: 700px; margin: 0 auto; padding-bottom: 100px; }
         .party-header { text-align: center; margin: 30px 0; }
         .party-title { font-family: 'Pacifico', cursive; font-size: 3.2rem; color: #fff; text-shadow: 3px 3px 0 rgba(0,0,0,0.1); }
         .party-subtitle { font-family: var(--font-heading); font-size: 1.5rem; color: rgba(255,255,255,0.9); margin-top: -10px; }
 
-        /* 蛋糕样式优化 */
         .cake-container { position: relative; height: 200px; width: 200px; margin: 40px auto; cursor: pointer; }
         .cake-body {
             position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
@@ -193,33 +173,32 @@
         }
         @keyframes flicker { 0% { transform: translateX(-50%) scale(1); opacity: 1; } 100% { transform: translateX(-50%) scale(1.1); opacity: 0.8; } }
 
-        /* 纸张样式 */
         .letter-paper {
             background: #fff; padding: 30px; margin: 30px 0; border-radius: 5px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             position: relative; transform: rotate(-1deg);
             font-family: var(--font-heading); line-height: 1.8; font-size: 1.1rem;
-            background-image: linear-gradient(#f1f1f1 1px, transparent 1px); background-size: 100% 30px; /* 信纸横线 */
+            background-image: linear-gradient(#f1f1f1 1px, transparent 1px); background-size: 100% 30px; 
         }
         .letter-paper::before { content: ''; position: absolute; top: -15px; left: 50%; width: 100px; height: 30px; background: rgba(255,255,255,0.5); transform: translateX(-50%) rotate(2deg); }
 
-        /* 许愿墙 (气泡风) */
+        /* 许愿墙优化 */
         #wish-stream {
-            position: relative; height: 350px; margin-top: 40px; overflow: hidden;
+            position: relative; height: 380px; margin-top: 40px; overflow: hidden;
             border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);
-            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1));
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.15));
         }
         .wish-bubble {
-            position: absolute; padding: 10px 20px; background: rgba(255,255,255,0.85);
-            border-radius: 30px; color: #555; font-size: 0.9rem;
+            position: absolute; padding: 8px 18px; background: rgba(255,255,255,0.85);
+            border-radius: 30px; color: #555; font-size: 0.95rem; font-weight: 500;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1); white-space: nowrap;
             animation: floatUp linear forwards; bottom: -50px; cursor: pointer;
+            transition: transform 0.2s;
         }
-        .wish-bubble:hover { transform: scale(1.1) !important; z-index: 100; background: #fff; }
+        .wish-bubble:hover { transform: scale(1.1) !important; z-index: 100; background: #fff; color: #a18cd1; }
 
-        @keyframes floatUp { to { bottom: 110%; transform: translateX(20px); } }
+        @keyframes floatUp { to { bottom: 120%; transform: translateX(15px); } }
 
-        /* 底部Dock栏 */
         .dock-bar {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(15px);
@@ -238,9 +217,9 @@
 </head>
 <body>
 
-    <!-- BGM: 确保 bgMusic.mp3 和 index.html 在同一级目录 -->
+    <!-- BGM: 确保 bgmusic.mp3 和 index.html 在同一级目录，文件名全小写 -->
     <audio id="bgm" loop>
-        <source src="bgMusic.mp3" type="audio/mpeg">
+        <source src="bgmusic.mp3" type="audio/mpeg">
     </audio>
     <div class="music-orb" onclick="toggleMusic()">
         <i class="fas fa-music"></i>
@@ -316,8 +295,8 @@
     <script>
         // === 配置中心 ===
         const CONFIG = {
-            correctNames: ["王延芳", "延芳", "芳芳", "小芳","大芳"], // 允许的名字
-            birthDate: "2004-11-30", // 这里的日期用于计算
+            correctNames: ["王延芳", "延芳", "芳芳", "小芳","大芳"], 
+            birthDate: "2004-11-30", 
             letterText: `
                 亲爱的王延芳：<br><br>
                 见信如晤。✨<br>
@@ -384,9 +363,9 @@
             }, 1000);
         }
 
-        // 4. 拆礼物 (优化防卡死版)
+        // 4. 拆礼物 (防卡死 + 修复烟花)
         function openGift() {
-            // 先执行视觉动画，确保界面有反应
+            // 视觉动画
             const box = document.querySelector('.gift-box');
             if (box) {
                 box.style.animation = 'none';
@@ -395,20 +374,20 @@
             }
 
             // 尝试放烟花
-            try { fireworks(); } catch(e) { console.log('烟花特效加载失败'); }
+            fireworks();
 
-            // 无论音乐是否播放成功，800毫秒后都跳转
+            // 页面跳转
             setTimeout(() => {
                 switchStage('stage-gift', 'stage-party');
                 typeWriter(CONFIG.letterText);
                 startWishStream();
             }, 800);
 
-            // 最后尝试播放音乐，避免因音乐报错卡住流程
+            // 尝试播放音乐
             try {
                 toggleMusic(true);
             } catch (e) {
-                console.log("音乐自动播放失败，不影响主流程", e);
+                console.log("音乐自动播放被拦截，需手动点击");
             }
         }
 
@@ -427,7 +406,7 @@
                 confirmButtonColor: '#ff9a9e',
                 backdrop: `rgba(0,0,123,0.4) url("https://sweetalert2.github.io/images/nyan-cat.gif") left top no-repeat`
             });
-            try { fireworks(); } catch(e){}
+            fireworks();
         }
 
         // 6. 打字机
@@ -439,14 +418,30 @@
             setTimeout(() => el.style.opacity = 1, 100);
         }
 
-        // 7. 愿望流 (Bubbles)
-        const wishes = ["暴富暴瘦", "桃花朵朵开", "逢考必过", "天天开心", "吃不胖", "永远18岁", "万事胜意"];
+        // 7. 愿望流 (内容大扩充)
+        const wishes = [
+            "✨ 财源滚滚", "🍎 平平安安", "💖 桃花朵朵开", "🐱 猫狗双全", "🥤 奶茶自由",
+            "💪 发量王者", "🚀 升职加薪", "😴 每天睡到自然醒", "🌈 心想事成", "🍓 莓有烦恼",
+            "🐳 自由自在", "🌟 闪闪发光", "🔥 鸿运当头", "🧘‍♀️ 拒绝内耗", "🍖 吃不胖体质",
+            "💰 暴富暴瘦", "🌻 永远热泪盈眶", "🧸 保持童心", "🦄 遇见美好", "🏖️ 说走就走",
+            "🍉 快乐加倍", "🌙 晚安好梦", "🎈 每天开心", "🎉 欧气爆棚", "💎 颜值爆表",
+            "🔑 解锁新成就", "🎵 快乐常伴", "❤️ 被爱包围", "🥑 充满活力", "🍀 好运连连"
+        ];
+        
         function startWishStream() {
             const container = document.getElementById('wish-stream');
+            // 初始生成一些
+            for(let i=0; i<5; i++) {
+                setTimeout(() => {
+                    const text = wishes[Math.floor(Math.random() * wishes.length)];
+                    createWishBubble(text, container);
+                }, i * 800);
+            }
+            // 持续生成
             setInterval(() => {
                 const text = wishes[Math.floor(Math.random() * wishes.length)];
                 createWishBubble(text, container);
-            }, 1800);
+            }, 1500);
         }
 
         function createWishBubble(text, container, isUser = false) {
@@ -455,18 +450,25 @@
             bubble.innerText = (isUser ? "🌟 " : "🎋 ") + text;
             
             // 随机样式
-            const left = Math.random() * 80 + 5;
-            const size = Math.random() * 0.4 + 0.8; // 0.8 - 1.2 scale
-            const duration = Math.random() * 5 + 6; // 6-11s
+            const left = Math.random() * 80 + 5; // 5% - 85%
+            const size = Math.random() * 0.4 + 0.8; // 大小随机
+            const duration = Math.random() * 3 + 8; // 8s - 11s 飘动时间
 
             bubble.style.left = left + '%';
             bubble.style.transform = `scale(${size})`;
             bubble.style.animationDuration = duration + 's';
             
+            // 随机颜色微调
+            if(!isUser) {
+                const hue = Math.floor(Math.random() * 360);
+                bubble.style.borderLeft = `3px solid hsl(${hue}, 70%, 80%)`;
+            }
+
             if(isUser) {
                 bubble.style.background = "#fff0f0"; 
-                bubble.style.border = "1px solid #ff9a9e";
-                bubble.style.zIndex = 10;
+                bubble.style.border = "2px solid #ff9a9e";
+                bubble.style.zIndex = 200;
+                bubble.style.fontWeight = "bold";
             }
 
             container.appendChild(bubble);
@@ -485,6 +487,7 @@
             if (text) {
                 createWishBubble(text, document.getElementById('wish-stream'), true);
                 Swal.fire({ icon: 'success', title: '愿望已升空', timer: 1500, showConfirmButton: false });
+                fireworks();
             }
         }
 
@@ -494,7 +497,9 @@
                 "上上签：所念皆如愿", 
                 "大吉：财运滚滚来", 
                 "中吉：生活没烦恼", 
-                "小吉：今日宜喝奶茶"
+                "小吉：今日宜喝奶茶",
+                "事业签：升职加薪",
+                "平安签：岁岁平安"
             ];
             Swal.fire({
                 title: '今日运势',
@@ -505,8 +510,24 @@
         }
 
         function fireworks() {
+            // 确保 confetti 已加载
             if (typeof confetti === 'function') {
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#ff9a9e', '#a18cd1', '#fad0c4'] });
+                var count = 200;
+                var defaults = { origin: { y: 0.7 } };
+
+                function fire(particleRatio, opts) {
+                    confetti(Object.assign({}, defaults, opts, {
+                        particleCount: Math.floor(count * particleRatio)
+                    }));
+                }
+
+                fire(0.25, { spread: 26, startVelocity: 55 });
+                fire(0.2, { spread: 60 });
+                fire(0.35, { spread: 100, decay: 0.91, scalar: 0.8 });
+                fire(0.1, { spread: 120, startVelocity: 25, decay: 0.92, scalar: 1.2 });
+                fire(0.1, { spread: 120, startVelocity: 45 });
+            } else {
+                console.log("Confetti library not loaded yet");
             }
         }
 
@@ -525,15 +546,13 @@
         // 全局点击特效
         document.addEventListener('click', (e) => {
             if(e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
-            try {
-                if (typeof confetti === 'function') {
-                    confetti({
-                        particleCount: 15, spread: 40, 
-                        origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
-                        colors: ['#ffffff', '#ff9a9e'] 
-                    });
-                }
-            } catch(err) {}
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 15, spread: 40, 
+                    origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
+                    colors: ['#ffffff', '#ff9a9e'] 
+                });
+            }
         });
 
     </script>
