@@ -4,13 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>王延芳的专属梦幻空间</title>
-    <!-- 引入高颜值字体 -->
-    <link href="https://fonts.googleapis.com/css2?family=Zcool+XiaoWei&family=Noto+Sans+SC:wght@300;500&family=Pacifico&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
-    <!-- SweetAlert2 弹窗库 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- 1. 字体库：已替换为国内 loli.net 镜像 (速度极快) -->
+    <link href="https://fonts.loli.net/css2?family=Zcool+XiaoWei&family=Noto+Sans+SC:wght@300;500&family=Pacifico&display=swap" rel="stylesheet">
+    
+    <!-- 2. 图标库：已替换为 Staticfile 源 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- 3. 动画库：已替换为 Staticfile 源 -->
+    <link rel="stylesheet" href="https://cdn.staticfile.org/animate.css/4.1.1/animate.min.css"/>
+    
+    <!-- 4. 撒花特效库：已替换为 Staticfile 源 -->
+    <script src="https://cdn.staticfile.org/canvas-confetti/1.6.0/confetti.browser.min.js"></script>
+    
+    <!-- 5. SweetAlert2 弹窗库：已替换为 Staticfile 源 -->
+    <script src="https://cdn.staticfile.org/sweetalert2/11.10.1/sweetalert2.all.min.js"></script>
     
     <style>
         /* --- 0. 全局变量与重置 --- */
@@ -230,7 +238,7 @@
 </head>
 <body>
 
-    <!-- BGM: 请替换为你的mp3链接 -->
+    <!-- BGM: 确保 bgMusic.mp3 和 index.html 在同一级目录 -->
     <audio id="bgm" loop>
         <source src="bgMusic.mp3" type="audio/mpeg">
     </audio>
@@ -376,21 +384,32 @@
             }, 1000);
         }
 
-        // 4. 拆礼物
+        // 4. 拆礼物 (优化防卡死版)
         function openGift() {
-            toggleMusic(true); // 尝试自动播放
+            // 先执行视觉动画，确保界面有反应
             const box = document.querySelector('.gift-box');
-            box.style.animation = 'none';
-            box.style.transform = 'scale(5) rotateY(180deg) rotateX(20deg)';
-            box.style.opacity = 0;
+            if (box) {
+                box.style.animation = 'none';
+                box.style.transform = 'scale(5) rotateY(180deg) rotateX(20deg)';
+                box.style.opacity = 0;
+            }
 
-            fireworks(); // 先放个烟花助兴
+            // 尝试放烟花
+            try { fireworks(); } catch(e) { console.log('烟花特效加载失败'); }
 
+            // 无论音乐是否播放成功，800毫秒后都跳转
             setTimeout(() => {
                 switchStage('stage-gift', 'stage-party');
                 typeWriter(CONFIG.letterText);
                 startWishStream();
             }, 800);
+
+            // 最后尝试播放音乐，避免因音乐报错卡住流程
+            try {
+                toggleMusic(true);
+            } catch (e) {
+                console.log("音乐自动播放失败，不影响主流程", e);
+            }
         }
 
         // 5. 吹蜡烛
@@ -408,7 +427,7 @@
                 confirmButtonColor: '#ff9a9e',
                 backdrop: `rgba(0,0,123,0.4) url("https://sweetalert2.github.io/images/nyan-cat.gif") left top no-repeat`
             });
-            fireworks();
+            try { fireworks(); } catch(e){}
         }
 
         // 6. 打字机
@@ -486,7 +505,9 @@
         }
 
         function fireworks() {
-            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#ff9a9e', '#a18cd1', '#fad0c4'] });
+            if (typeof confetti === 'function') {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 }, colors: ['#ff9a9e', '#a18cd1', '#fad0c4'] });
+            }
         }
 
         function toggleMusic(forcePlay = false) {
@@ -504,16 +525,17 @@
         // 全局点击特效
         document.addEventListener('click', (e) => {
             if(e.target.tagName === 'BUTTON' || e.target.tagName === 'INPUT') return;
-            confetti({
-                particleCount: 15, spread: 40, 
-                origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
-                colors: ['#ffffff', '#ff9a9e'] 
-            });
+            try {
+                if (typeof confetti === 'function') {
+                    confetti({
+                        particleCount: 15, spread: 40, 
+                        origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
+                        colors: ['#ffffff', '#ff9a9e'] 
+                    });
+                }
+            } catch(err) {}
         });
 
     </script>
 </body>
 </html>
-
-
-
